@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 /**
@@ -127,7 +128,11 @@ public class UrlRequest {
             conn.setRequestMethod(requestMethod);
             //设置当前实例使用的SSLSoctetFactory
             conn.setSSLSocketFactory(ssf);
-            conn.connect();
+            try {
+                conn.connect();
+            } catch (SocketTimeoutException e) {
+                conn.connect();
+            }
             //往服务器端写内容
             if (null != outputStr) {
                 OutputStream os = conn.getOutputStream();

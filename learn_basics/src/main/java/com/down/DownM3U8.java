@@ -1,17 +1,13 @@
 package com.down;
 
 
-
+import com.utils.JFileUtils;
 import com.utils.UrlRequest;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
 import java.io.*;
-import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -21,24 +17,37 @@ import java.util.regex.Pattern;
 
 public class DownM3U8 {
     private static String rootPath = "F:\\m3u8dir";
+    static HashMap keyFileMap = new HashMap();
+    static int size;
 
-    public static String getIndexFile(String urlpath) {
-        try {
-            URL url = new URL(urlpath);
-            SSLContext sslcontext = SSLContext.getInstance("SSL", "SunJSSE");
-            //下在资源
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-            String content = "";
-            String line;
-            while ((line = in.readLine()) != null) {
-                content += line + "\n";
-            }
-            in.close();
-            System.out.println(content);
-            return content;
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static String getIndexFile(String indexPath, String title) {
+
+        final String prePath = indexPath.substring(0, indexPath.lastIndexOf("/") + 1);
+
+        String get = UrlRequest.httpsRequest(indexPath, "GET", null);
+
+        final List<String> videoUrlList = analysisIndex(get);
+        size = videoUrlList.size();
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        final String uuid = title;
+//                UUID.randomUUID().toString().replaceAll("-", "");
+
+        for (int i = 0; i < videoUrlList.size(); i++) {
+            final String urlpath = videoUrlList.get(i);
+            final String j = String.valueOf(i);
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    List<String> videoUrl = new ArrayList<>();
+                    videoUrl.add(j);
+                    videoUrl.add(urlpath);
+                    downLoadIndexFile(prePath, videoUrl, uuid);
+                }
+            });
         }
+        executorService.shutdown();
+
+
         return null;
     }
 
@@ -49,7 +58,7 @@ public class DownM3U8 {
      * @return
      */
     public static List analysisIndex(String content) {
-        Pattern pattern = Pattern.compile(".*ts");
+        Pattern pattern = Pattern.compile("[^/]+ts");
         Matcher ma = pattern.matcher(content);
 
         List<String> list = new ArrayList<String>();
@@ -57,7 +66,6 @@ public class DownM3U8 {
         while (ma.find()) {
             String s = ma.group();
             list.add(s);
-            System.out.println(s);
         }
         return list;
     }
@@ -72,14 +80,11 @@ public class DownM3U8 {
     public static List<String> downLoadIndexFile(String preUrlPath, List<String> urlList, String uuid) {
         try {
             List<String> filePathList = new ArrayList<String>();
+            String key = urlList.get(0);
+            urlList.remove(0);
             for (String urlpath : urlList) {
-                HttpsURLConnection conn= UrlRequest.getHttpsURLConnection(preUrlPath + urlpath);
-                try {
-                    conn.connect();
-                } catch (SocketTimeoutException e) {
-                    conn.connect();
-                }
-
+                HttpsURLConnection conn = UrlRequest.getHttpsURLConnection(preUrlPath + urlpath);
+                conn.connect();
                 String fileOutPath = rootPath + File.separator + uuid + File.separator + urlpath;
                 File file = new File(rootPath + File.separator + uuid);
                 //下在资源
@@ -95,6 +100,7 @@ public class DownM3U8 {
 
                 }
                 System.out.println(Thread.currentThread().getName() + "下载完成..." + fileOutPath);
+                keyFileMap.put(key, fileOutPath);
                 dataInputStream.close();
                 filePathList.add(fileOutPath);
             }
@@ -106,28 +112,52 @@ public class DownM3U8 {
         return null;
     }
 
-    public static void main(String[] args) {
-        String indexPath = "https://cn5.tabaocss.com/hls/20180827/d877e17e0adceedfd37c6f83b511adad/1535324437/index.m3u8";
-//        indexPath = "https://s1.jxtvsb.com/20191101/0NlAZQLuGpKiJcBt/index.m3u8";
-        final String prePath = indexPath.substring(0, indexPath.lastIndexOf("/") + 1);
-        String get = UrlRequest.httpsRequest(indexPath, "GET", null);
+    public static void composeFile(String fileOutPath) {
+        List<String> files = JFileUtils.getFiles(fileOutPath);
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(new File("F:\\m3u8dir\\jhs一拳超人.mp4"));
+            byte[] bytes = new byte[1024];
+            int length = 0;
 
-        final List<String> videoUrlList = analysisIndex(get);
+            for (int i = 0; i < files.size(); i++) {
+                String s = files.get(i);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(1);
-        final String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        for (final String urlpath : videoUrlList) {
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    List<String> videoUrl = new ArrayList<>();
-                    videoUrl.add(urlpath);
-                    downLoadIndexFile(prePath, videoUrl, uuid);
+                File file = new File(s);
+                if (!file.exists())
+                    continue;
+                FileInputStream fis = new FileInputStream(file);
+                while ((length = fis.read(bytes)) != -1) {
+                    fileOutputStream.write(bytes, 0, length);
                 }
-            });
+                System.out.println(s);
+            }
 
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        executorService.shutdown();
-// https://cn5.tabaocss.com/hls/20180827/d877e17e0adceedfd37c6f83b511adad/1535324437/film_00000.ts
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        String indexPath = "https://cn5.tabaocss.com/hls/20180827/d877e17e0adceedfd37c6f83b511adad/1535324437/index.m3u8";
+        String name = "一拳超人1";
+        getIndexFile(indexPath, name);
+        Boolean is = true;
+        String puthFile = rootPath + File.separator + name;
+        Thread.sleep(10000);
+        while (is) {
+            List<String> files = JFileUtils.getFiles(puthFile);
+            System.out.println("下载->" + files.size() + "一共->" + size);
+            if (files.size() == size) {
+                System.out.println("开始合并");
+                is = false;
+
+            }
+            Thread.sleep(1000);
+        }
+
+        composeFile(puthFile);
+
     }
 }

@@ -1,4 +1,5 @@
 package com.utils;
+
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;

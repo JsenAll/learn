@@ -12,7 +12,7 @@ public class DownM3U8Test {
 
     @Test
     public void down() {
-        DownM3U8.down("https://sp.new131.com/20190623/7kXhtTKn/900kb/hls/index.m3u8");
+//        DownM3U8.down("https://sp.new131.com/20190623/7kXhtTKn/900kb/hls/index.m3u8");
     }
 
     public static void main(String[] args) {
@@ -23,6 +23,6 @@ public class DownM3U8Test {
         String get = UrlRequest.httpsRequest(indexPath, "GET", null);
         List videoUrlList =downM3U8. analysisIndex(get);
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        List<String> fileList = downM3U8.downLoadIndexFile(prePath, videoUrlList,uuid);
+       downM3U8.downLoadIndexFile(prePath, videoUrlList,uuid);
     }
 }

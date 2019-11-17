@@ -38,10 +38,13 @@ public class DownM3U8 {
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {
+
                     List<String> videoUrl = new ArrayList<>();
                     videoUrl.add(j);
                     videoUrl.add(urlpath);
-                    downLoadIndexFile(prePath, videoUrl, uuid);
+                    while(!downLoadIndexFile(prePath, videoUrl, uuid)){
+                        System.out.println("再一次下载"+j);
+                    }
                 }
             });
         }
@@ -77,9 +80,8 @@ public class DownM3U8 {
      * @param urlList
      * @return
      */
-    public static List<String> downLoadIndexFile(String preUrlPath, List<String> urlList, String uuid) {
+    public static Boolean downLoadIndexFile(String preUrlPath, List<String> urlList, String uuid) {
         try {
-            List<String> filePathList = new ArrayList<String>();
             String key = urlList.get(0);
             urlList.remove(0);
             for (String urlpath : urlList) {
@@ -102,20 +104,26 @@ public class DownM3U8 {
                 System.out.println(Thread.currentThread().getName() + "下载完成..." + fileOutPath);
                 keyFileMap.put(key, fileOutPath);
                 dataInputStream.close();
-                filePathList.add(fileOutPath);
             }
 
-            return filePathList;
+
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return null;
+        return true;
     }
 
-    public static void composeFile(String fileOutPath) {
+    /**
+     * 将.ts 的视频片段合成MP4格式
+     *
+     * @param fileOutPath
+     * @param name
+     */
+    public static void composeFile(String fileOutPath, String name) {
         List<String> files = JFileUtils.getFiles(fileOutPath);
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(new File("F:\\m3u8dir\\jhs一拳超人.mp4"));
+            FileOutputStream fileOutputStream = new FileOutputStream(new File("F:\\m3u8dir\\" + name + ".mp4"));
             byte[] bytes = new byte[1024];
             int length = 0;
 
@@ -140,8 +148,8 @@ public class DownM3U8 {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        String indexPath = "https://cn5.tabaocss.com/hls/20180827/d877e17e0adceedfd37c6f83b511adad/1535324437/index.m3u8";
-        String name = "一拳超人1";
+        String indexPath = "https://cn5.tabaocss.com/hls/20180827/ceec142889715f32790407bed6500b9f/1535325189/index.m3u8";
+        String name = "一拳超人4";
         getIndexFile(indexPath, name);
         Boolean is = true;
         String puthFile = rootPath + File.separator + name;
@@ -157,7 +165,7 @@ public class DownM3U8 {
             Thread.sleep(1000);
         }
 
-        composeFile(puthFile);
+        composeFile(puthFile, name);
 
     }
 }

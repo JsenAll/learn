@@ -40,10 +40,9 @@ public class DownM3U8 {
                 public void run() {
 
                     List<String> videoUrl = new ArrayList<>();
-                    videoUrl.add(j);
-                    videoUrl.add(urlpath);
-                    while(!downLoadIndexFile(prePath, videoUrl, uuid)){
-                        System.out.println("再一次下载"+j);
+                    videoUrl.add(j);videoUrl.add(urlpath);
+                    while (!downLoadIndexFile(prePath, videoUrl, uuid)) {
+                        System.out.println("再一次下载" + j);
                     }
                 }
             });
@@ -151,19 +150,18 @@ public class DownM3U8 {
         String indexPath = "https://cn5.tabaocss.com/hls/20180827/ceec142889715f32790407bed6500b9f/1535325189/index.m3u8";
         String name = "一拳超人4";
         getIndexFile(indexPath, name);
-        Boolean is = true;
         String puthFile = rootPath + File.separator + name;
         Thread.sleep(10000);
+
+        Boolean is = true;
         while (is) {
             List<String> files = JFileUtils.getFiles(puthFile);
             System.out.println("下载->" + files.size() + "一共->" + size);
-            if (files.size() == size) {
-                System.out.println("开始合并");
-                is = false;
-
-            }
+            if (files.size() == size) is = false;
             Thread.sleep(1000);
         }
+        System.out.println("开始合并");
+
 
         composeFile(puthFile, name);
 

@@ -147,8 +147,8 @@ public class DownM3U8 {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        String indexPath = "https://cn5.tabaocss.com/hls/20180827/ceec142889715f32790407bed6500b9f/1535325189/index.m3u8";
-        String name = "一拳超人4";
+        String indexPath = "https://cn5.tabaocss.com/hls/20180827/738ab3aa192b020f690a4a339fb6820c/1535320810/index.m3u8";
+        String name = "一拳超人-1";
         getIndexFile(indexPath, name);
         String puthFile = rootPath + File.separator + name;
         Thread.sleep(10000);

@@ -38,8 +38,8 @@ public class ParseAnalyQsptvPC implements AnalyInterface {
 
     public static void main(String[] args) {
         try {
-            for (int i = 3; i < 13; i++) {
-                new ParseAnalyQsptvPC().parse("https://www.qsptv.com/play/23311-1-" + i + ".html", null);
+            for (int i = 1; i < 12; i++) {
+                new ParseAnalyQsptvPC().parse("https://www.qsptv.com/play/46764-1-" + i + ".html", null);
             }
 
         } catch (Exception e) {

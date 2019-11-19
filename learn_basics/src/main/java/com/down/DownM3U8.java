@@ -41,7 +41,6 @@ public class DownM3U8 {
                 public void run() {
 
                     List<String> videoUrl = new ArrayList<>();
-                    videoUrl.add(j);
                     videoUrl.add(urlpath);
                     while (!downLoadIndexFile(prePath, videoUrl, uuid)) {
                         System.out.println("再一次下载" + j);
@@ -83,8 +82,6 @@ public class DownM3U8 {
      */
     public static Boolean downLoadIndexFile(String preUrlPath, List<String> urlList, String uuid) {
         try {
-            String key = urlList.get(0);
-            urlList.remove(0);
             for (String urlpath : urlList) {
                 HttpsURLConnection conn = UrlRequest.getHttpsURLConnection(preUrlPath + urlpath);
                 String fileOutPath = rootPath + File.separator + uuid + File.separator + urlpath;
@@ -99,10 +96,8 @@ public class DownM3U8 {
                 int length = 0;
                 while ((length = dataInputStream.read(bytes)) != -1) {
                     fileOutputStream.write(bytes, 0, length);
-
                 }
-                System.out.println(Thread.currentThread().getName() + "下载完成..." + fileOutPath);
-                keyFileMap.put(key, fileOutPath);
+//                System.out.println(Thread.currentThread().getName() + "下载完成..." + fileOutPath);
                 dataInputStream.close();
             }
 
@@ -137,7 +132,7 @@ public class DownM3U8 {
                 while ((length = fis.read(bytes)) != -1) {
                     fileOutputStream.write(bytes, 0, length);
                 }
-                System.out.println(s);
+//                System.out.println(s);
             }
 
         } catch (FileNotFoundException e) {
@@ -169,8 +164,6 @@ public class DownM3U8 {
             }
         }
         System.out.println("开始合并");
-
-
         composeFile(puthFile, name);
 
     }

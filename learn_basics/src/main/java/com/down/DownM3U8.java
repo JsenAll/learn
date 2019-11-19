@@ -19,6 +19,7 @@ public class DownM3U8 {
     private static String rootPath = "F:\\m3u8dir";
     static HashMap keyFileMap = new HashMap();
     static int size;
+    static final int nThreads = 10;
 
     public static String getIndexFile(String indexPath, String title) {
 
@@ -28,7 +29,7 @@ public class DownM3U8 {
 
         final List<String> videoUrlList = analysisIndex(get);
         size = videoUrlList.size();
-        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
         final String uuid = title;
 //                UUID.randomUUID().toString().replaceAll("-", "");
 
@@ -40,7 +41,8 @@ public class DownM3U8 {
                 public void run() {
 
                     List<String> videoUrl = new ArrayList<>();
-                    videoUrl.add(j);videoUrl.add(urlpath);
+                    videoUrl.add(j);
+                    videoUrl.add(urlpath);
                     while (!downLoadIndexFile(prePath, videoUrl, uuid)) {
                         System.out.println("再一次下载" + j);
                     }
@@ -85,7 +87,6 @@ public class DownM3U8 {
             urlList.remove(0);
             for (String urlpath : urlList) {
                 HttpsURLConnection conn = UrlRequest.getHttpsURLConnection(preUrlPath + urlpath);
-                conn.connect();
                 String fileOutPath = rootPath + File.separator + uuid + File.separator + urlpath;
                 File file = new File(rootPath + File.separator + uuid);
                 //下在资源
@@ -146,19 +147,26 @@ public class DownM3U8 {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        String indexPath = "https://cn5.tabaocss.com/hls/20180827/738ab3aa192b020f690a4a339fb6820c/1535320810/index.m3u8";
-        String name = "一拳超人-1";
+    public static void downUrl(String indexPath, String name) {
+        System.out.println("开始下载->" + name);
         getIndexFile(indexPath, name);
         String puthFile = rootPath + File.separator + name;
-        Thread.sleep(10000);
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         Boolean is = true;
         while (is) {
             List<String> files = JFileUtils.getFiles(puthFile);
             System.out.println("下载->" + files.size() + "一共->" + size);
             if (files.size() == size) is = false;
-            Thread.sleep(1000);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         System.out.println("开始合并");
 

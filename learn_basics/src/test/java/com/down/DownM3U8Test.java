@@ -13,7 +13,7 @@ public class DownM3U8Test {
     @Test
     public void down() {
         String indexPath = "https://cn5.tabaocss.com/hls/20180827/738ab3aa192b020f690a4a339fb6820c/1535320810/index.m3u8";
-        String name = "一拳超人-1";
+        String name = "一拳超人-test";
         DownM3U8.downUrl(indexPath, name);
     }
 

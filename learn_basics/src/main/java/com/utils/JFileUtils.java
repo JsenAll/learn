@@ -19,6 +19,10 @@ public class JFileUtils {
         List<String> files = new ArrayList<String>();
         File file = new File(path);
         File[] tempList = file.listFiles();
+        if (tempList == null || tempList.length == 0){
+            System.out.println("没有文件");
+            return files;
+        }
 
         for (int i = 0; i < tempList.length; i++) {
             if (tempList[i].isFile()) {

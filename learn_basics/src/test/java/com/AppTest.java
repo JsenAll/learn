@@ -17,4 +17,16 @@ public class AppTest
     {
         assertTrue( true );
     }
+
+    public static void main(String[] args) {
+        String [] a={"蒋厚森","韩钰 ","恩泽","中正"};
+        for (String s : a) {
+            System.out.println(s);
+        }
+
+
+
+
+
+    }
 }

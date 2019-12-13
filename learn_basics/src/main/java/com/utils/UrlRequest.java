@@ -27,6 +27,7 @@ public class UrlRequest {
             //创建SSLContext
             SSLContext sslContext = SSLContext.getInstance("SSL");
             TrustManager[] tm = {new MyX509TrustManager()};
+
             //初始化
             sslContext.init(null, tm, new java.security.SecureRandom());
 

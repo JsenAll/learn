@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 
 public class DownM3U8 {
     private static String rootPath = "F:\\m3u8dir";
-    static HashMap keyFileMap = new HashMap();
     static int size;
     static final int nThreads = 10;
 
@@ -86,11 +85,12 @@ public class DownM3U8 {
                 HttpsURLConnection conn = UrlRequest.getHttpsURLConnection(preUrlPath + urlpath);
                 String fileOutPath = rootPath + File.separator + uuid + File.separator + urlpath;
                 File file = new File(rootPath + File.separator + uuid);
-                //下在资源
-                DataInputStream dataInputStream = new DataInputStream(conn.getInputStream());
                 if (!file.exists()) {
                     file.mkdirs();
                 }
+                //下在资源
+                DataInputStream dataInputStream = new DataInputStream(conn.getInputStream());
+
                 FileOutputStream fileOutputStream = new FileOutputStream(new File(fileOutPath));
                 byte[] bytes = new byte[1024];
                 int length = 0;
@@ -146,19 +146,13 @@ public class DownM3U8 {
         System.out.println("开始下载->" + name);
         getIndexFile(indexPath, name);
         String puthFile = rootPath + File.separator + name;
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         Boolean is = true;
         while (is) {
             List<String> files = JFileUtils.getFiles(puthFile);
-            System.out.println("下载->" + files.size() + "一共->" + size);
-            if (files.size() == size) is = false;
+            System.out.println("未完成" + (size - files.size()));
+            if (files.size() == size && files.size() != 0) is = false;
             try {
-                Thread.sleep(1000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

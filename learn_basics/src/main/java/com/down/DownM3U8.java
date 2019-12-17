@@ -16,9 +16,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DownM3U8 {
-    private static String rootPath = "F:\\m3u8dir";
+    private static String rootPath = "F:\\m3u8dir";//下载目录
     static int size;
-    static final int nThreads = 10;
+    static final int nThreads = 10;//启动几个线程进行下载
 
     public static String getIndexFile(String indexPath, String title) {
 
@@ -60,15 +60,20 @@ public class DownM3U8 {
      * @return
      */
     public static List analysisIndex(String content) {
-        Pattern pattern = Pattern.compile("[^/]+ts");
-        Matcher ma = pattern.matcher(content);
-
         List<String> list = new ArrayList<String>();
 
-        while (ma.find()) {
-            String s = ma.group();
-            list.add(s);
+        String[] split = content.split("\n");
+        for (int i = 0; i < split.length; i++) {
+            String s = split[i];
+            Pattern pattern = Pattern.compile("[^/]+ts");
+            Matcher ma = pattern.matcher(s);
+            while (ma.find()) {
+                String s1 = ma.group();
+                list.add(s1);
+            }
         }
+
+
         return list;
     }
 

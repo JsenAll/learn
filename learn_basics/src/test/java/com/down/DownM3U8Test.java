@@ -12,8 +12,8 @@ public class DownM3U8Test {
 
     @Test
     public void down() {
-        String indexPath = "https://cn5.tabaocss.com/hls/20180827/738ab3aa192b020f690a4a339fb6820c/1535320810/index.m3u8";
-        String name = "一拳超人-test";
+        String indexPath = "https://youku.com-iqiyi.net/20191216/22687_ac28360f/1000k/hls/index.m3u8";
+        String name = "庆余年-29";
         DownM3U8.downUrl(indexPath, name);
     }
 
